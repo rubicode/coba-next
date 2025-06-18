@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { checkPassword, generateAccessToken, generateRefreshToken } from '@/utils/helper'
+import { comparePassword, generateAccessToken, generateRefreshToken } from '@/utils/helper'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
@@ -9,7 +9,7 @@ export async function POST(req) {
         const user = await prisma.user.findUnique({ where: { username } })
         if (!user) throw new Error('Username not found')
 
-        const isMatch = await checkPassword(password, user.password)
+        const isMatch = await comparePassword(password, user.password)
         if (!isMatch) throw new Error('Incorrect password')
 
         const accessToken = generateAccessToken({ userId: user.id })
