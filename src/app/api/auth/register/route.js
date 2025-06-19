@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { generatePassword, generateAccessToken, generateRefreshToken } from '@/utils/helper'
+import { generatePassword, generateToken } from '@/utils/helper'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
@@ -20,16 +20,15 @@ export async function POST(req) {
             },
         })
 
-        const accessToken = generateAccessToken({ userId: newUser.id })
-        const refreshToken = generateRefreshToken({ userId: newUser.id })
+        const token = generateToken({ userId: newUser.id })
 
         await prisma.user.update({
             where: { id: newUser.id },
-            data: { token: refreshToken },
+            data: { token },
         })
 
-        const res = NextResponse.json({ username: newUser.username, accessToken })
-        res.cookies.set('refreshToken', refreshToken, {
+        const res = NextResponse.json({ username: newUser.username })
+        res.cookies.set('token', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'Strict',

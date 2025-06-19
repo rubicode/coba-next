@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { comparePassword, generateAccessToken, generateRefreshToken } from '@/utils/helper'
+import { comparePassword, generateToken } from '@/utils/helper'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
@@ -12,16 +12,15 @@ export async function POST(req) {
         const isMatch = await comparePassword(password, user.password)
         if (!isMatch) throw new Error('Incorrect password')
 
-        const accessToken = generateAccessToken({ userId: user.id })
-        const refreshToken = generateRefreshToken({ userId: user.id })
+        const token = generateToken({ userId: user.id })
 
         await prisma.user.update({
             where: { id: user.id },
-            data: { token: refreshToken },
+            data: { token },
         })
 
-        const res = NextResponse.json({ username: user.username, accessToken })
-        res.cookies.set('refreshToken', refreshToken, {
+        const res = NextResponse.json({ username: user.username })
+        res.cookies.set('token', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'Strict',

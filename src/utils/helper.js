@@ -1,3 +1,6 @@
+import { NextResponse } from 'next/server'
+import { cookies } from 'next/headers';
+
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -9,19 +12,22 @@ export const generatePassword = (password) => bcrypt.hashSync(password, saltRoun
 
 export const comparePassword = (password, hash) => bcrypt.compareSync(password, hash)
 
-export const generateAccessToken = (data) => jwt.sign(data, secretKey, { expiresIn: '15m' })
-
-export const generateRefreshToken = (data) => jwt.sign(data, secretKey, { expiresIn: '7d' })
+export const generateToken = (data) => jwt.sign(data, secretKey)
 
 export const decodeToken = (token) => jwt.verify(token, secretKey)
 
-export const verifyToken = async function (req, res, next) {
+export const verifyToken = async function () {
     try {
-        const token = req.get('Authorization')?.slice(7)
-        const decoded = decodeToken(token)
-        req.userId = decoded.userId
-        next()
-    } catch (error) {
-        res.status(401).json({ message: "token invalid" })
+        const cookieStore = await cookies();
+        const token = await cookieStore.get('token')?.value;
+
+        if (!token) throw new Error('No access token found')
+
+        const payload = decodeToken(token)
+
+        return payload
+    } catch (err) {
+        return NextResponse.json({ message: err.message }, { status: 401 })
     }
+
 }

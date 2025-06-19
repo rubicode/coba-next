@@ -1,12 +1,13 @@
 'use client';
 
+import { request } from '@/api/request';
 import { useRouter } from 'next/navigation';
 
 export default function Logout() {
     const router = useRouter();
 
-    const logout = () => {
-        localStorage.clear();
+    const logout = async () => {
+        await request.post('auth/logout')
         router.push('/');
     };
 

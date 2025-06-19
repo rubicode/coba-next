@@ -1,10 +1,9 @@
 import { prisma } from '@/lib/prisma'
-import { verifyToken } from '@/middleware/verifyToken'
-import { generatePassword } from '@/utils/helper'
+import { generatePassword, verifyToken } from '@/utils/helper'
 
 export async function GET(request) {
-    const token = await verifyToken(request)
-    if (token.status === 401) return token
+    const result = await verifyToken()
+    if (result.status === 401) return result
 
     const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
@@ -31,8 +30,8 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-    const token = await verifyToken(request)
-    if (token.status === 401) return token
+    const result = await verifyToken()
+    if (result.status === 401) return result
 
     try {
         const { username, password } = await request.json()

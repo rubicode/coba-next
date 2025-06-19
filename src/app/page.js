@@ -13,11 +13,8 @@ export default function Login() {
   const login = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await request.post('auth/login', user);
-      if (data.accessToken) {
-        localStorage.setItem('user', JSON.stringify(data));
-        router.push("/todos");
-      }
+      await request.post('auth/login', user);
+      router.push("/todos");
     } catch (e) {
       console.error(e);
       alert(e?.response?.data?.message || "Login failed");

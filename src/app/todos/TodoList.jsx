@@ -26,7 +26,7 @@ export default function TodoList() {
                 </thead>
                 <tbody>
                     {todos.map((todo, index) => (
-                        <TodoItem key={todo._id} no={index + 1} item={todo} />
+                        <TodoItem key={todo.id} no={index + 1} item={todo} />
                     ))}
                 </tbody>
             </table>

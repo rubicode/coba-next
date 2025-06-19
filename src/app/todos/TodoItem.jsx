@@ -71,7 +71,7 @@ export default function TodoItem({ no, item }) {
                         </button>
                         <button
                             type="button"
-                            onClick={() => dispatch(removeTodoAsync(item._id))}
+                            onClick={() => dispatch(removeTodoAsync(item.id))}
                             className="px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                         >
                             Delete

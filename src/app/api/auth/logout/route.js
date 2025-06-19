@@ -1,11 +1,14 @@
 import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
+import { verifyToken } from '@/utils/helper'
 
 export async function POST(req) {
     try {
-        const { username } = await req.json()
 
-        const user = await prisma.user.findUnique({ where: { username } })
+        const result = await verifyToken()
+        if (result.status === 401) return result
+
+        const user = await prisma.user.findUnique({ where: { id: result.userId } })
         if (!user) throw new Error('User not found')
 
         await prisma.user.update({
@@ -14,7 +17,7 @@ export async function POST(req) {
         })
 
         const res = NextResponse.json({ success: true })
-        res.cookies.delete('refreshToken')
+        res.cookies.delete('token')
 
         return res
     } catch (e) {

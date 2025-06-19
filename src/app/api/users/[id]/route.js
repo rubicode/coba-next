@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma'
-import { verifyToken } from '@/middleware/verifyToken'
+import { verifyToken } from '@/utils/helper'
 
 export async function GET(request, { params }) {
-  const token = await verifyToken(request)
-  if (token.status === 401) return token
+  const result = await verifyToken()
+  if (result.status === 401) return result
 
   const { id } = params
   const user = await prisma.user.findUnique({ where: { id } })
@@ -29,8 +29,8 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const token = await verifyToken(request)
-  if (token.status === 401) return token
+  const result = await verifyToken(request)
+  if (result.status === 401) return result
 
   const { id } = params
   try {

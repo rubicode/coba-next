@@ -22,20 +22,20 @@ export const createTodoAsync = createAsyncThunk(
     async (todo, { rejectWithValue }) => {
         try {
             const { data } = await create(todo.title)
-            return { _id: todo._id, todo: data }
+            return { id: todo.id, todo: data }
         } catch (e) {
-            console.log('gagal tambah', e, todo._id)
-            return rejectWithValue(todo._id)
+            console.log('gagal tambah', e, todo.id)
+            return rejectWithValue(todo.id)
         }
     }
 )
 
 export const removeTodoAsync = createAsyncThunk(
     'todo/removeTodo',
-    async _id => {
+    async id => {
         try {
-            const { data } = await remove(_id)
-            return data._id
+            const { data } = await remove(id)
+            return data.id
         } catch (error) {
             console.log('gagal delete', e)
         }
@@ -47,7 +47,7 @@ export const resendTodoAsync = createAsyncThunk(
     async todo => {
         try {
             const { data } = await create(todo.title)
-            return { oldId: todo._id, newId: data._id }
+            return { oldId: todo.id, newId: data.id }
         } catch (error) {
             console.log('gagal delete', e)
         }
@@ -74,7 +74,7 @@ export const todoSlice = createSlice({
             .addCase(createTodoAsync.rejected, (state, action) => {
                 state.status = 'idle'
                 state.value = state.value.map(todo => {
-                    if (todo._id == action.payload)
+                    if (todo.id == action.payload)
                         todo.sent = false
                     return todo
                 })
@@ -82,20 +82,20 @@ export const todoSlice = createSlice({
             .addCase(createTodoAsync.fulfilled, (state, action) => {
                 state.status = 'idle'
                 state.value = state.value.map(todo => {
-                    if (todo._id == action.payload._id)
-                        todo._id = action.payload.todo._id
+                    if (todo.id == action.payload.id)
+                        todo.id = action.payload.todo.id
                     return todo
                 })
             })
             .addCase(removeTodoAsync.fulfilled, (state, action) => {
                 state.status = 'idle'
-                state.value = state.value.filter(todo => todo._id !== action.payload)
+                state.value = state.value.filter(todo => todo.id !== action.payload)
             })
             .addCase(resendTodoAsync.fulfilled, (state, action) => {
                 state.status = 'idle'
                 state.value = state.value.map(todo => {
-                    if (todo._id == action.payload.oldId) {
-                        todo._id = action.payload.newId
+                    if (todo.id == action.payload.oldId) {
+                        todo.id = action.payload.newId
                         todo.sent = true
                     }
                     return todo
@@ -110,8 +110,8 @@ export const { add } = todoSlice.actions
 export const getTodos = state => state.todo.value
 
 export const addTodo = title => (dispatch) => {
-    const _id = Date.now()
-    const todo = { _id, title, complete: false, sent: true }
+    const id = Date.now()
+    const todo = { id, title, complete: false, sent: true }
     dispatch(add(todo))
     dispatch(createTodoAsync(todo))
 }
